@@ -1,0 +1,35 @@
+# build docker image
+docker build -t bird-ubuntu .
+
+docker network create --subnet 10.10.0.0/24 birdnet
+
+docker run -itd --rm --name bird1 \
+  --network host \
+  --cap-add NET_ADMIN \
+  --cap-add NET_RAW \
+  bird-ubuntu
+
+docker run -itd --rm --name bird-r1 \
+  --network birdnet --ip 10.10.0.2 \
+  --cap-add NET_ADMIN --cap-add NET_RAW \
+  -v $(pwd)/r1-bird.conf:/etc/bird/bird.conf \
+  bird-ubuntu
+
+docker run -itd --rm --name bird-r2 \
+  --network birdnet --ip 10.10.0.3 \
+  --cap-add NET_ADMIN --cap-add NET_RAW \
+  -v $(pwd)/r2-bird.conf:/etc/bird/bird.conf \
+  bird-ubuntu
+
+docker network connect --ip 10.10.23.2 birdnet23 bird-r2
+
+docker run -itd --rm --name bird-r3 \
+  --network birdnet23 --ip 10.10.23.3 \
+  --cap-add NET_ADMIN --cap-add NET_RAW \
+  -v $(pwd)/r3-bird.conf:/etc/bird/bird.conf \
+  bird-ubuntu
+
+docker run -it --name bird1 --network birdnet --ip 10.10.0.1 \
+             --cap-add NET_ADMIN bird-ubuntu
+docker run -it --name bird2 --network birdnet --ip 10.10.0.2 --cap-add NET_ADMIN bird-ubuntu
+docker run -it --name bird3 --network birdnet --ip 10.10.0.3 --cap-add NET_ADMIN bird-ubuntu
