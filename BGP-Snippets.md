@@ -4,6 +4,10 @@ Quick reference notes, configuration snippets
 
 ## LOCAL_PREF
 
+Local Pref is an attribute 
+1. Used inside AS to decide the preferred path for outbound traffic
+2. Applied as soon as a route enters AS via EBGP
+
 ### Example 1: Routes from specific neighbour
 
 The route is learnt via EBGP (may be an ISP)
@@ -62,3 +66,29 @@ import filter {
 ```
 
 If route received from the BGP peer falls within the prefix 10.0.0.0/8.
+
+### Example 4: AS-Path preference
+
+```
+if bgp_path ~ [ = 64512 * ] then bgp_local_pref = 50;
+```
+
+Set the preference for AS path containing 64512
+
+## Summary of LOCAL_PREF BIRD condition
+
+Condition           | BIRD Condition Example
+--------------------|-----------------------------------------------
+Prefix              | net ~ 10.0.0.0/8
+Community           | (65500,100) ~ bgp_community
+ISP/Neighbor        | proto = "primary_isp"
+AS-PATH             | bgp_path ~ [ = 64512 * ]
+AS-PATH length      | bgp_path.len > 5
+MED                 | bgp_med < 50
+Origin type         | bgp_origin = ORIGIN_IGP
+IGP metric          | ospf_metric
+Next-hop            | bgp_next_hop = <ip>
+Route type          | from = "<peer>"
+RPKI state          | roa_check(...)
+Prefix length       | net.len = 24
+
