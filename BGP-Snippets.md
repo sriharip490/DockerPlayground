@@ -8,6 +8,7 @@ Quick reference notes, configuration snippets
 
 The route is learnt via EBGP (may be an ISP)
 
+```
 protocol bgp ISP1 {
     local as 65000;
     neighbor 192.0.2.1 as 64500;
@@ -19,3 +20,4 @@ protocol bgp ISP1 {
 
     export all;
 }
+```
