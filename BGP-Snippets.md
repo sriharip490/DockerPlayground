@@ -75,6 +75,36 @@ if bgp_path ~ [ = 64512 * ] then bgp_local_pref = 50;
 
 Set the preference for AS path containing 64512
 
+### Example 4
+
+router id 10.0.0.1;
+
+protocol device {}
+
+# Health check for DNS service (dummy route)
+protocol static DNS_Anycast {
+    route 203.0.113.53/32 via "lo";    # Announce only if reachable
+}
+
+# Upstream BGP
+protocol bgp ISP_A {
+    local as 65001;
+    neighbor 198.51.100.1 as 65000;
+
+    import none;  # Do not accept external prefixes into local routing
+    export filter {
+        if net = 203.0.113.53/32 then accept;
+        reject;
+    };
+}
+
+
+1. BGP Announcement of Anycast route.
+2. All the POPs run the similar configuration - exporting the Anycast Route
+   prefix 203.0.113.53/32
+3. Advertise ONLY if the DNS server is functional
+
+
 ## Summary of LOCAL_PREF BIRD condition
 
 Condition           | BIRD Condition Example
@@ -92,3 +122,141 @@ Route type          | from = "<peer>"
 RPKI state          | roa_check(...)
 Prefix length       | net.len = 24
 
+
+## BGP CDN Core - POP Router - ISP Peering
+
+```
+                     Internet
+     ┌─────────────────┼───────────────────┐
+     │                 │                   │
+ ISP1 AS64501     ISP2 AS64502       ISP3 AS64503
+     │                 │                   │
+ +---+---+         +---+---+           +---+---+
+ |  POP1 |         |  POP2 |           |  POP3 |
+ |10.10.1.1        |10.20.1.1          |10.30.1.1
+ +---+---+         +---+---+           +---+---+
+     \                |                 /
+      \               |                /
+       \              |               /
+        +-----------------------------+
+                     |
+                    CORE
+                  10.1.1.1
+```
+
+* POPx <--> ISPx peering via eBGP
+* POPx, CDN Core in same AS - iBGP peering
+* Each of the POPx does the following
+  + Install static route to Anycast IP 203.0.113.10/32
+  + Next hop interface is "lo" - it never goes down
+  ```
+    protocol static {
+        route 203.0.113.10/32 via "lo"
+    }
+  ```
+  + The route is installed in the BGP RIB (not in Linux)
+
+### BIRD Configuration - POP Router
+
+* BIRD BGP configuration in POP1 router - IP 10.10.1.1
+* Similar configuration across POP2 (10.20.1.1), POP3 (10.30.1.1)
+* iBGP Peering with CDN Core Router (10.1.1.1)
+```
+router id 10.10.1.1;
+
+protocol device {}
+protocol kernel { persist; export all; }
+protocol direct {}
+
+# Anycast prefix (local origin)
+protocol static anycast {
+    route 203.0.113.10/32 via "lo";
+}
+
+# iBGP to CORE
+protocol bgp CORE {
+    local as 65000;
+    neighbor 10.1.1.1 as 65000;
+
+    source address 10.10.1.1;
+
+    import all;
+    export filter {
+        if net = 203.0.113.10/32 then accept;
+        reject;
+    };
+}
+
+# eBGP to ISP1
+protocol bgp ISP1 {
+    local as 65000;
+    neighbor 192.0.2.1 as 64501;
+
+    source address 10.10.1.1;
+
+    # Export only Anycast
+    export filter {
+        if net = 203.0.113.10/32 then accept;
+        reject;
+    };
+
+    import all;   # Learn upstream routes (optional)
+}
+```
+
+## Per Packet Flow
+
+How a single HTTP request starting from the user workstation flows
+through till the Origin Server, the reverse path
+```
+  Step 1: User sends request to Anycast IP (203.0.113.10)
+  -------------------------------------------------------
+  User
+    |
+    | 1) DNS resolves to same Anycast IP globally
+    |
+    | 2) Packet leaves user's ISP → global routers choose shortest AS path
+    |
+    v
++--------+
+| POP-N  |
+| nearest|
++--------+
+
+  Step 2: POP forwards internally to CDN Core
+  --------------------------------------------
+    |
+    | 3) POP → internal BGP → learns best path to Origin via CORE
+    |
+    v
++---------+
+|  CORE   |
++---------+
+
+  Step 3: Core sends request to Origin servers
+  --------------------------------------------
+    |
+    | 4) CORE → RIB/FIB → backend VPC/DC
+    |
+    v
++----------+
+| ORIGIN   |
++----------+
+
+  Step 4: Response takes reverse path
+  -----------------------------------
+    |
+    v
++---------+    5) CORE → POP (closest to user)
+|  CORE   |
++---------+
+    |
+    v
++--------+    6) POP returns content to the user
+| POP-N  |
++--------+
+    |
+    v
+  User
+
+```
