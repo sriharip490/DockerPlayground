@@ -1,37 +1,10 @@
 #!/bin/bash
+set -e
 
-cmdflag=0
-cmdstr="none"
+# Run the setup script/logic here
+echo "Running setup steps..."
+/app/data/setup_script.sh 
 
-exec_command()
-{
-   local_cmdstr=$1
-   if [ $local_cmdstr == "build" ]; then
-       ln -s /app/data .
-       echo "Source folder link created"
-   fi
-}
-
-while getopts "c:" opt; do
-   case $opt in
-      c)
-         echo "Option -c was provided"
-	 cmdflag=1
-         cmdstr=$OPTARG
-         ;;
-      \?)
-         echo "Invalid option: -$OPTARG" >&2
-         exit 1
-         ;;
-      :)
-         echo "Invalid option: -$OPTARG" >&2
-         exit 1
-         ;;
-   esac
-done
-
-
-if [ $cmdflag -eq 1 ]; then
-   exec_command $cmdstr
-fi
+# Then, execute the main command provided via CMD or docker run arguments
+exec "$@" 
 
