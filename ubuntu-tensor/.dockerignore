@@ -1,0 +1,26 @@
+# Source Control
+.git
+.gitignore
+
+# Python leftovers
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local Data and Models (Mount these instead!)
+data/
+models/
+downloads/
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
