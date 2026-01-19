@@ -1,0 +1,15 @@
+services:
+  tf-non-avx:
+    build: .
+    container_name: tf_dev_env
+    ports:
+      - "8888:8888"  # Maps localhost:8888 to Container:8888
+    volumes:
+      - ./project:/app
+      - ./data:/app/data
+    environment:
+      - TF_CPP_MIN_LOG_LEVEL=2
+    stdin_open: true
+    tty: true
+    # Override the default command to start Jupyter Lab automatically
+    command: jupyter lab --ip=10.10.48.10 --port=8888 --no-browser --allow-root --NotebookApp.token=''
