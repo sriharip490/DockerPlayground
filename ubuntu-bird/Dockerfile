@@ -6,11 +6,16 @@ LABEL maintainer="PSH Linux <srihari.linux5@example.com>"
 LABEL version="1.0"
 LABEL description="Minimal container which has BIRD daemon"
 
-# Install BIRD and basic networking tools
+# Install BIRD and basic networking tools, and lest you forget vim
 RUN apt-get update && \
-    apt-get install -y bird2 iproute2 iputils-ping tcpdump vim && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir /run/bird
+    apt-get install -y bird2 \
+                     net-tools \
+                     iproute2  \
+                     iputils-ping \ 
+                     tcpdump \
+                     vim && \
+    mkdir /run/bird && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy a sample config (you can override with a bind mount)
 COPY bird.conf /etc/bird/bird.conf
@@ -31,6 +36,6 @@ VOLUME ["/etc/bird"]
 ENTRYPOINT ["/usr/local/bin/bird_start.sh"]
 
 # Default interactive shell via CMD
-# CMD ["/bin/bash"]
+CMD ["/bin/bash"]
 
 

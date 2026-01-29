@@ -7,8 +7,7 @@ exec_command()
 {
    local_cmdstr=$1
    if [ $local_cmdstr == "build" ]; then
-       ln -s /app/data .
-       echo "Source folder link created"
+       echo "Source folder link created" >> debug.log
    fi
 }
 

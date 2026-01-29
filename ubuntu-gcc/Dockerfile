@@ -9,7 +9,10 @@ LABEL description="Minimal container which has gcc compiler"
 
 RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential && \
-	apt-get install -y --no-install-recommends vim && \
+	apt-get install -y --no-install-recommends vim \
+            net-tools \
+            iproute2 \
+            iputils-ping && \
 	rm -rf /var/lib/apt/lists/*
 
 # copy init files
@@ -17,6 +20,7 @@ COPY .vimrc ~/
 
 # copy the setup script from host to the container
 COPY setup.sh /app/data/
+COPY setup_script.sh /app/data/
 
 # execute permissions
 RUN chmod +x /app/data/setup.sh
@@ -28,5 +32,5 @@ WORKDIR /app/data
 ENTRYPOINT ["/app/data/setup.sh"]
 
 # default argument to the entrypoint
-CMD ["-c build"]
+CMD ["/bin/bash"]
 

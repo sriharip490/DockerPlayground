@@ -32,6 +32,7 @@ docker build -t bird-ubuntu .
 Start the containers - execute the following commands
 ```
 - start container bird-r1
+
 docker run -itd --rm --name bird-r1 \
   --network birdnet --ip 10.10.0.2 \
   --cap-add NET_ADMIN --cap-add NET_RAW \
@@ -39,6 +40,7 @@ docker run -itd --rm --name bird-r1 \
   bird-ubuntu
 
 - start container bird-r2
+
 docker run -itd --rm --name bird-r2 \
   --network birdnet --ip 10.10.0.3 \
   --cap-add NET_ADMIN --cap-add NET_RAW \
@@ -46,9 +48,11 @@ docker run -itd --rm --name bird-r2 \
   bird-ubuntu
 
 - connect the container bird-r2 to network birdnet23
+
 docker network connect --ip 10.10.23.2 birdnet23 bird-r2
 
 - start container bird-r3
+
 docker run -itd --rm --name bird-r3 \
   --network birdnet23 --ip 10.10.23.3 \
   --cap-add NET_ADMIN --cap-add NET_RAW \
@@ -56,6 +60,7 @@ docker run -itd --rm --name bird-r3 \
   bird-ubuntu
 
 - Check the status of the 3 containers
+
 docker ps
 ```
 
@@ -67,6 +72,7 @@ Now login to the containers and play
   docker exec -it bird-r1 /bin/bash
 
 - use birdc command to display various configurations. 
+
   Example 1 - show route
 
 root@5eaa3049e756:/# birdc show route
@@ -86,6 +92,7 @@ Table master4:
 	via 10.10.0.3 on eth0
 
   Example 2 - show protocols
+
 root@5eaa3049e756:/# birdc show protocols
 BIRD 2.0.8 ready.
 Name       Proto      Table      State  Since         Info

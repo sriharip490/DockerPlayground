@@ -8,7 +8,7 @@ LABEL version="1.0"
 LABEL description="Minimal container which has DNSMASQ"
 
 # Build time environment variables
-ARG CONFIG_DIR=/home/srihari/docker/config
+ARG CONFIG_DIR=$HOME/docker/config
 
 # DNS server ports which the container will be reachable
 EXPOSE 53/udp
