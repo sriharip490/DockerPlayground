@@ -1,6 +1,6 @@
 # Container with Tensorflow
 * **Work in Progress** 
-* Major issue - Otaining the Tensorflow version which is built without `avx` support
+* Major issue - Obtaining the Tensorflow version which is built without `avx` support
 * No tensorflow wheel available in the public domain, which may help the cause
 * Alternative is to do a bazel build using Tensorflow sources
 * This is the link

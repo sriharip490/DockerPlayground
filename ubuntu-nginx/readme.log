@@ -1,0 +1,20 @@
+0. Remove the image (if it is there)
+   docker rmi ubuntu-nginx:latest
+
+1. Build the docker image
+   docker build -t ubuntu-nginx .
+
+2. Check the docker images
+   docker images
+
+3. Run the docker container
+   docker run -itd \
+    --rm --name ubuntu-nginx-container \
+    -p 8080:80 \
+    -v $(pwd)/html:/var/www/html \
+    --network tensor-net ubuntu-nginx
+
+4. Determine the network for the container
+   docker inspect --format='{{range $net, $v := .NetworkSettings.Networks}}{{printf "%s\n" $net}}{{end}}' ubuntu-nginx-container
+
+
