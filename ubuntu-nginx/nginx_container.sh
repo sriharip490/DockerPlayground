@@ -10,4 +10,5 @@ docker run -itd \
     --rm --name ${cnr_name} \
     -p 8080:80 \
     -v $(pwd)/html:/var/www/html \
+    -v $(pwd)/ssl:/etc/nginx/ssl \
     --network ${cnr_net} ${cnr}
