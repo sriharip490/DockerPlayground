@@ -46,9 +46,13 @@ openssl req -x509 -nodes -days 365 -newkey \
     rsa:2048 -keyout nginx.key -out nginx.crt
 ```
 
+## Thing to Remember
 
-
-
-
-
-
+### Migration to Production
+* Disable default nginx welcome page
+* Hide nginx version
+* Use firewall (ufw)
+* Disable password login for SSH
+* Use strong authentication
+* Keep system updated
+* Never expose Docker daemon port
