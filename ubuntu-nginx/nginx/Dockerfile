@@ -10,6 +10,7 @@ RUN apt-get update && \
                        net-tools \
                        iputils-ping \
                        tcpdump \
+                       curl \
                        vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -25,10 +26,10 @@ COPY nginx_start.sh /usr/local/bin/nginx_start.sh
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Command to run in the nginx container
-ENTRYPOINT ["/usr/local/bin/nginx_start.sh"]
+#ENTRYPOINT ["/usr/local/bin/nginx_start.sh"]
 
 # Start nginx in foreground
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
 
 #CMD ["nginx", "-g", "daemon off;"]
 

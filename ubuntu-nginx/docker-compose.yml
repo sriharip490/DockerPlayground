@@ -1,0 +1,35 @@
+services:
+
+  backend:
+    build: ./backend
+    image: ubuntu-node-backend
+    container_name: nodejs
+    restart: always
+    networks:
+      - tensor-net
+
+  nginx:
+    build: ./nginx
+    image: ubuntu-nginx
+    container_name: nginx-server
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - tensor-net
+    volumes:
+      - ./html:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./nginx/nginx_start.sh:/usr/local/bin/nginx_start.sh
+    depends_on:
+      - backend
+    restart: always
+    entrypoint: ["/bin/bash", "/usr/local/bin/nginx_start.sh"]
+
+networks:
+  tensor-net:
+    name: tensor-net
+    external: true
+    driver: bridge
+

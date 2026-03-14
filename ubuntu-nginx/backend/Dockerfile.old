@@ -1,0 +1,14 @@
+
+# Use Ubuntu 22.04 as base
+FROM ubuntu:22.04
+
+WORKDIR /app
+
+COPY package.json .
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
