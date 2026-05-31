@@ -24,6 +24,19 @@
   - Clone the git vpp repository
   - In `start.sh`, modify the `MNT_DIR_SRC` macro with the folder name
 * After container starts
+
+## Build pre-steps
+* Need to git tag the source since the `vpp-dev/src/CMakeLists.txt` runs
+  `git describe` to fix the `VPP_LIB_VERSION` below snippet
+```
+string(REPLACE "-" ";" VPP_LIB_VERSION ${VPP_VERSION})
+list(GET VPP_LIB_VERSION 0 VPP_LIB_VERSION)
+
+# Run the following command inside /workspace/vpp-dev
+git tag -a v0.0.0 -m "version 0.0.0"
+```
+
+## Build steps
 ```
   sudo make install-dep
   make build
