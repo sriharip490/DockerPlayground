@@ -1,0 +1,60 @@
+FROM ubuntu:22.04
+
+# Force the build engine to run subsequent steps as root
+USER root
+
+# Avoid interactive prompts during apt installations (like tzdata!)
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install absolute baseline utilities needed to kick off the Makefile
+RUN apt-get update && apt-get install -y \
+    git \
+    sudo \
+    curl \
+    make \
+    python3 \
+    lsb-release \
+    net-tools \
+    iputils-ping \
+    tcpdump \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build arguments to dynamically pass host user/group IDs
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG USER_NAME=developer
+
+# Create a group and user matching the host configuration
+RUN groupadd -g ${GROUP_ID} ${USER_NAME} && \
+    useradd -m -u ${USER_ID} -g ${USER_NAME} -s /bin/bash ${USER_NAME}
+
+# Grant passwordless sudo privilege to this user
+RUN echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set the operational context to the new user
+USER ${USER_NAME}
+
+# Set up the working directory layout
+WORKDIR /workspace
+
+# Clone a shallow copy of VPP directly from the official repo
+# inside the image layer to safely run the dependency installation
+# without file-matching errors.
+RUN git clone --depth 1 https://github.com/FDio/vpp.git vpp-dev
+
+# Move into the directory and execute the dependency runner
+WORKDIR /workspace/vpp-dev
+
+# Set the environment variable option to bypass prompts globally in this shell layer
+ENV INTERACTIVE=0
+
+# PIPE 'YES' INTO THE MAKE ENGINE:
+# This forces a continuous stream of 'y' inputs to instantly satisfy any [Y/n] prompts
+RUN yes | make install-dep
+
+# Force Git to trust this workspace globally inside the image
+RUN git config --global --add safe.directory /workspace/vpp-dev
+
+# Default command to drop you into a clean development shell
+CMD ["/bin/bash"]
