@@ -77,5 +77,25 @@ DBGvpp#
 DBGvpp# 
 DBGvpp# 
 DBGvpp# 
-``
+```
+
+## Multiple VPP nodes
+* Use of docker compose yml definition for starting 2 or more VPP container nodes.
+  `start-vpp-nodes.sh` is used.
+* After launch of the two nodes, `vpp service` needs to be started in each
+* vpp uses startup configuration - run the following command
+```
+# Run Node 1 configuration
+./build-root/install-vpp_debug-native/vpp/bin/vpp \
+  unix { interactive runtime-dir /tmp/vpp1 cli-listen /tmp/cli-1.sock } \
+  buffers { buffers-per-numa 4000 default data-size 2048 } \
+  dpdk { no-pci }
+
+# Run Node 2 configuration
+./build-root/install-vpp_debug-native/vpp/bin/vpp \
+  unix { interactive runtime-dir /tmp/vpp2 cli-listen /tmp/cli-2.sock } \
+  buffers { buffers-per-numa 4000 default data-size 2048 } \
+  dpdk { no-pci }
+```
+* Stoping the 2 nodes, we use `stop-vpp-nodes.sh`
 

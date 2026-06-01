@@ -1,0 +1,36 @@
+services:
+  vpp-node-1:
+    image: vpp-dev-env
+    container_name: vpp-dev-1
+    privileged: true
+    network_mode: host
+    # Log in as the user you created in the Dockerfile
+    user: "${HOST_UID}:${HOST_GID}"
+    volumes:
+      - /dev:/dev
+      - ${HOME}/workspace/project/vpp-dev:/workspace/vpp-dev
+    working_dir: /workspace/vpp-dev
+    environment:
+      - MAKE_PARALLEL_JOBS=2
+    # Change command to an idling bash shell so the container stays alive
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+  vpp-node-2:
+    image: vpp-dev-env
+    container_name: vpp-dev-2
+    privileged: true
+    network_mode: host
+    # Log in as the user you created in the Dockerfile
+    user: "${HOST_UID}:${HOST_GID}"
+    volumes:
+      - /dev:/dev
+      - ${HOME}/workspace/project/vpp-dev:/workspace/vpp-dev
+    working_dir: /workspace/vpp-dev
+    environment:
+      - MAKE_PARALLEL_JOBS=2
+    # Change command to an idling bash shell so the container stays alive
+    command: /bin/bash
+    stdin_open: true
+    tty: true
