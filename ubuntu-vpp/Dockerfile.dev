@@ -41,10 +41,11 @@ WORKDIR /workspace
 # Clone a shallow copy of VPP directly from the official repo
 # inside the image layer to safely run the dependency installation
 # without file-matching errors.
-RUN git clone --depth 1 https://github.com/FDio/vpp.git vpp-dev
+RUN git clone --depth 1 https://github.com/FDio/vpp.git vpp
 
 # Move into the directory and execute the dependency runner
-WORKDIR /workspace/vpp-dev
+#WORKDIR /workspace/vpp-dev
+WORKDIR /workspace/vpp
 
 # Set the environment variable option to bypass prompts globally in this shell layer
 ENV INTERACTIVE=0

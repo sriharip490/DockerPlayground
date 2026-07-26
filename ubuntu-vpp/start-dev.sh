@@ -1,13 +1,18 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-set -x
+#set -x
 
-VPPDEV_CNR="vpp-dev-container"
-VPPDEV_IMAGE="vpp-dev-env"
+SRC_ROOT=$(dirname $(realpath $0))
+source ${SRC_ROOT}/dev.env
 
-MNT_DIR_SRC="${HOME}/workspace/project"
-MNT_DIR_TGT="/workspace"
+# VPPDEV_CNR="vpp-dev-container"
+# VPPDEV_IMAGE="vpp-dev-env"
 
+MNT_DIR_SRC=${VPP_ROOT_DIR}
+# MNT_DIR_TGT="/workspace"
+
+echo "VPP Docker image: ${VPPDEV_IMAGE}"
+echo "Mounting ${MNT_DIR_SRC} to ${MNT_DIR_TGT}"
 echo "Starting VPP dev container ${VPPDEV_CNR}"
 
 docker run -it \

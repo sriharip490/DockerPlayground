@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 export HOST_UID=$(id -u)
 export HOST_GID=$(id -g)
@@ -9,5 +9,5 @@ node2="vpp-dev-2"
 
 echo "Starting two VPP nodes - ${node1}, ${node2}"
 
-docker compose up -d --remove-orphans
+docker compose --env-file dev.env up -d --remove-orphans
 

@@ -1,15 +1,23 @@
 services:
   vpp-node-1:
-    image: vpp-dev-env
-    container_name: vpp-dev-1
+    # Load all variables from dev.env inside the container environment
+    env_file:
+      - dev.env
+    image: ${VPPDEV_IMAGE}
+    build:
+      context: .   # Points to the directory where your Dockerfile lives
+      dockerfile: Dockerfile.dev
+    container_name: ${VPPDEV_CNR_1}
     privileged: true
-    network_mode: host
+    networks:
+      - vpp-net-1       # Private LAN 1
+      - vpp-transit     # Shared Transit WAN
     # Log in as the user you created in the Dockerfile
     user: "${HOST_UID}:${HOST_GID}"
     volumes:
       - /dev:/dev
-      - ${HOME}/workspace/project/vpp-dev:/workspace/vpp-dev
-    working_dir: /workspace/vpp-dev
+      - ${VPP_SRC_DIR}:/workspace/vpp
+    working_dir: /workspace/vpp
     environment:
       - MAKE_PARALLEL_JOBS=2
     # Change command to an idling bash shell so the container stays alive
@@ -18,19 +26,36 @@ services:
     tty: true
 
   vpp-node-2:
-    image: vpp-dev-env
-    container_name: vpp-dev-2
+    # Load all variables from dev.env inside the container environment
+    env_file:
+      - dev.env
+    image: ${VPPDEV_IMAGE}
+    container_name: ${VPPDEV_CNR_2}
+    build:
+      context: .   # Points to the directory where your Dockerfile lives
+      dockerfile: Dockerfile.dev
     privileged: true
-    network_mode: host
+    networks:
+      - vpp-net-2       # Private LAN 2
+      - vpp-transit     # Shared Transit WAN
     # Log in as the user you created in the Dockerfile
     user: "${HOST_UID}:${HOST_GID}"
     volumes:
       - /dev:/dev
-      - ${HOME}/workspace/project/vpp-dev:/workspace/vpp-dev
-    working_dir: /workspace/vpp-dev
+      - ${VPP_SRC_DIR}:/workspace/vpp
+    working_dir: /workspace/vpp
     environment:
       - MAKE_PARALLEL_JOBS=2
     # Change command to an idling bash shell so the container stays alive
     command: /bin/bash
     stdin_open: true
     tty: true
+
+# Docker automatically provisions all three networks on 'docker compose up'
+networks:
+  vpp-net-1:
+    driver: bridge
+  vpp-net-2:
+    driver: bridge
+  vpp-transit:
+    driver: bridge

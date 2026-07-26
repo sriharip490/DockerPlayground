@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 node1="vpp-dev-1"
 node2="vpp-dev-2"

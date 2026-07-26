@@ -1,6 +1,18 @@
 # VPP Playground
 Welcome to VPP playground !
 
+## Quick Summary
+This README covers 
+* How to setup your workspace to build, deploy Docker container images for building and testing VPP
+* The pre-requisites, specific instructions needed for build etc.
+* VPP build depends on certain tools. This folder contains 2 Dockerfiles 
+  - Dockerfile.builder - covered in section `VPP Builder`
+  - Dockerfile.dev - covered in section `VPP Dev Builder`
+  Recommened that go through both sections, and for convenience, follow `VPP Dev Builder`
+
+## Pre-Requisites
+* Clone [github VPP]() repository in the workspace.
+
 ## VPP Builder
 
 * Docker file used `Dockerfile.builder`
@@ -44,6 +56,11 @@ git tag -a v0.0.0 -m "version 0.0.0"
   sudo make install-dep
   make build
 ```
+### Build Clean
+* For cleaning the build, run the command from inside the container in the workspace vpp root folder
+```
+make wipe
+```
 
 ## VPP Dev Builder
 This is a better version of builder Docker container. The VPP build 
@@ -53,7 +70,11 @@ dependencies are taken care during image build time.
 
 ### Build steps
 ```
+# For building VPP
 make build
+
+# For clean VPP
+make wipe
 ```
 
 ### Test Run
