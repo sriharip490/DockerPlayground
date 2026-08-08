@@ -7,13 +7,19 @@ services:
     build:
       context: .   # Points to the directory where your Dockerfile lives
       dockerfile: Dockerfile.dev
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+        USER_NAME: ${USER_NAME}
     container_name: ${VPPDEV_CNR_1}
     privileged: true
     networks:
-      - vpp-net-1       # Private LAN 1
-      - vpp-transit     # Shared Transit WAN
+      vpp-net-1:       # Private LAN 1
+        ipv4_address: ${VPPDEV_CNR_1_IP}
+      vpp-transit:     # Shared Transit WAN
+        ipv4_address: ${VPPDEV_CNR_1_TRANSIT_IP}
     # Log in as the user you created in the Dockerfile
-    user: "${HOST_UID}:${HOST_GID}"
+    user: "${USER_ID}:${GROUP_ID}"
     volumes:
       - /dev:/dev
       - ${VPP_SRC_DIR}:/workspace/vpp
@@ -34,12 +40,16 @@ services:
     build:
       context: .   # Points to the directory where your Dockerfile lives
       dockerfile: Dockerfile.dev
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+        USER_NAME: ${USER_NAME}
     privileged: true
     networks:
-      - vpp-net-2       # Private LAN 2
-      - vpp-transit     # Shared Transit WAN
+      vpp-transit:     # Shared Transit WAN
+        ipv4_address: ${VPPDEV_CNR_2_TRANSIT_IP}
     # Log in as the user you created in the Dockerfile
-    user: "${HOST_UID}:${HOST_GID}"
+    user: "${USER_ID}:${GROUP_ID}"
     volumes:
       - /dev:/dev
       - ${VPP_SRC_DIR}:/workspace/vpp
@@ -55,7 +65,11 @@ services:
 networks:
   vpp-net-1:
     driver: bridge
-  vpp-net-2:
-    driver: bridge
+    ipam:
+      config:
+        - subnet: ${VPPDEV_NET_1_SUBNET}
   vpp-transit:
     driver: bridge
+    ipam:
+      config:
+        - subnet: ${VPPDEV_TRANSIT_NET_SUBNET}

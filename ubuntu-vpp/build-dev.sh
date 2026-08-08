@@ -7,6 +7,9 @@ source ${SRC_ROOT}/dev.env
 echo "Building docker container ${DOCKER_IMAGE} for building VPP"
 
 docker build \
+  --build-arg USER_ID=$(id -u) \
+  --build-arg GROUP_ID=$(id -g) \
+  --build-arg USER_NAME=${USER} \
   -t ${VPPDEV_IMAGE} \
   -f ${VPP_DOCKER_DIR}/Dockerfile.dev \
   ${VPP_DOCKER_DIR}
